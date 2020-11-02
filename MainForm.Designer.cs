@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("");
-            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("");
+            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("");
+            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("");
             this.label1 = new System.Windows.Forms.Label();
             this.listView1 = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -71,6 +71,7 @@
             this.button4 = new System.Windows.Forms.Button();
             this.label29 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
+            this.debugLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -94,7 +95,7 @@
             this.listView1.GridLines = true;
             this.listView1.HideSelection = false;
             this.listView1.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1});
+            listViewItem3});
             this.listView1.Location = new System.Drawing.Point(11, 215);
             this.listView1.Name = "listView1";
             this.listView1.Size = new System.Drawing.Size(597, 299);
@@ -214,6 +215,9 @@
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(75, 23);
             this.button3.TabIndex = 35;
+            this.button3.Text = "Upload";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // workspaceLabel
             // 
@@ -260,7 +264,7 @@
             this.listView2.GridLines = true;
             this.listView2.HideSelection = false;
             this.listView2.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem2});
+            listViewItem4});
             this.listView2.Location = new System.Drawing.Point(615, 215);
             this.listView2.Name = "listView2";
             this.listView2.Size = new System.Drawing.Size(194, 283);
@@ -432,12 +436,23 @@
             this.label10.TabIndex = 12;
             this.label10.Text = "User:";
             // 
+            // debugLabel
+            // 
+            this.debugLabel.AutoSize = true;
+            this.debugLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.debugLabel.Location = new System.Drawing.Point(22, 164);
+            this.debugLabel.Name = "debugLabel";
+            this.debugLabel.Size = new System.Drawing.Size(153, 17);
+            this.debugLabel.TabIndex = 12;
+            this.debugLabel.Text = "Default, no value given";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoValidate = System.Windows.Forms.AutoValidate.EnableAllowFocusChange;
             this.ClientSize = new System.Drawing.Size(820, 523);
+            this.Controls.Add(this.debugLabel);
             this.Controls.Add(this.label29);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.label28);
@@ -525,6 +540,9 @@
         //private System.Windows.Forms.Button button1;
         //private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label label10;
+
+        //Added so I can see debug values
+        private System.Windows.Forms.Label debugLabel;
     }
 }
 

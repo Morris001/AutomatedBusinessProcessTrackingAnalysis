@@ -16,8 +16,5 @@ This is an enhancement of a previous iteration of this project where this group 
 We utilized Visual Studio and C# to work on this project, and it works locally if you pull this repo and run the "start without debugging" command and are delivering a runnable .msi to Fellows Consulting Group.
 
 ### Senior Design Project: Fall 2020
--Cloud Data storage
-	Google Account Associated with project:
-	Email:	productivitytracker.f2020@gmail.com
-	Password: FCGF2020!
-	Birthday: January 1, 2000
+-MongoDB Data Storage
+	Uses Dr. Hill's MongoDB Account and a database provided to store files.

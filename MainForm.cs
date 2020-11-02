@@ -1,4 +1,7 @@
-﻿using System;
+﻿using MongoDB.Driver;
+using MongoDB.Driver.GridFS;
+using MongoDB.Bson;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -7,6 +10,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TimeTracker.View.EventReport.Consumer;
+using MongoDB.Bson.IO;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 
 namespace TimeTracker.View
 {
@@ -476,6 +482,7 @@ namespace TimeTracker.View
 				label27.Visible = false;
 				label28.Visible = false;
 				label29.Visible = false;
+				debugLabel.Visible = false;
 			}
 			else
 			{
@@ -492,6 +499,7 @@ namespace TimeTracker.View
 				label27.Visible = true;
 				label28.Visible = true;
 				label29.Visible = true;
+				debugLabel.Visible = true;
 			}
 		}
 
@@ -509,9 +517,59 @@ namespace TimeTracker.View
 			}
 		}
 
-		private void button3_Click(object sender, EventArgs e)
-		{ 
-			//Select Day to Upload
+		private void button3_Click(object sender, EventArgs e)//This is the upload button- use string[] GetFiles(string path) to get files in folder
+		{
+			var client = new MongoClient("mongodb+srv://admin:admin@cluster0.femb8.mongodb.net/group1db?retryWrites=true&w=majority");
+			var database = client.GetDatabase("group1db");
+
+
+			debugLabel.Text = "connected1";
+			//var collections = database.ListCollectionNames();
+			//debugLabel.Text = "connected2";
+			var collecJson = database.GetCollection<BsonDocument>("json");
+			var doc = new BsonDocument
+			{
+				{ "name", "Johan" },
+				{ "test", "test"}
+			};
+			collecJson.InsertOne(doc);
+			//var fs = new GridFSBucket(database);
+			/*
+			var collecCap = database.GetCollection<BsonDocument>("captures");
+			var collecCsv = database.GetCollection<BsonDocument>("csv");
+			var collecJson = database.GetCollection<BsonDocument>("json");
+			*/
+			//FilePathString
+			var userpath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+			var logPath = userpath + "/Logs/";
+			foreach (String filePath in Directory.GetFiles(logPath))//iterate over every file in log folder, returns full path of files
+			{
+				if (filePath.Contains(".csv"))//file goes to csv collection
+				{
+
+				}
+				else//files goes to json collection
+				{ 
+					
+				}
+			}
+			var capPath = userpath + "/Captures/";
+			foreach (String filepath in Directory.GetFiles(capPath))//iterate over every file in captures folder, returns full file path
+			{ 
+				
+			}
+
+
+			//TestUploads
+			var testPath = logPath + "Output2020_09_04.json";
+
+			using (var stream = File.OpenRead(testPath))
+			{
+				//debugLabel.Text = (fs.UploadFromStream(testPath, stream)).ToString();
+			}
+
+			//collecCap.InsertOneAsync(dcmt1);
+			//collecLog.InsertOneAsync(dcmt2);
 		}
 
 		private void Form1_Load(object sender, EventArgs e)
