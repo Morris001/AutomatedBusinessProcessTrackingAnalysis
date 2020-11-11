@@ -13,6 +13,7 @@ using TimeTracker.View.EventReport.Consumer;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
+using System.Windows.Forms.VisualStyles;
 
 namespace TimeTracker.View
 {
@@ -519,60 +520,46 @@ namespace TimeTracker.View
 
 		private void button3_Click(object sender, EventArgs e)//This is the upload button- use string[] GetFiles(string path) to get files in folder
 		{
-			var client = new MongoClient("mongodb+srv://admin:admin@cluster0.femb8.mongodb.net/group1db?retryWrites=true&w=majority");
+			//var client = new MongoClient("mongodb+srv://admin:admin@cluster0.femb8.mongodb.net/group1db?retryWrites=true&w=majority");
+			var client = new MongoClient("mongodb+srv://admin:admin@cluster0.oqexz.mongodb.net/group1db?retryWrites=true&w=majority");//personal mongoDB account made to test after issues with provided one
 			var database = client.GetDatabase("group1db");
-
-
-			debugLabel.Text = "connected1";
-			//var collections = database.ListCollectionNames();
-			//debugLabel.Text = "connected2";
-			var collecJson = database.GetCollection<BsonDocument>("json");
-			var doc = new BsonDocument
-			{
-				{ "name", "Johan" },
-				{ "test", "test"}
-			};
-			collecJson.InsertOne(doc);
-			//var fs = new GridFSBucket(database);
-			/*
-			var collecCap = database.GetCollection<BsonDocument>("captures");
-			var collecCsv = database.GetCollection<BsonDocument>("csv");
-			var collecJson = database.GetCollection<BsonDocument>("json");
-			*/
+			var fs = new GridFSBucket(database);
 			//FilePathString
 			var userpath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 			var logPath = userpath + "/Logs/";
 			foreach (String filePath in Directory.GetFiles(logPath))//iterate over every file in log folder, returns full path of files
 			{
-				if (filePath.Contains(".csv"))//file goes to csv collection
+				using (var stream = File.OpenRead(filePath))
 				{
-
-				}
-				else//files goes to json collection
-				{ 
-					
+					fs.UploadFromStream(filePath, stream);
 				}
 			}
 			var capPath = userpath + "/Captures/";
 			foreach (String filepath in Directory.GetFiles(capPath))//iterate over every file in captures folder, returns full file path
+			{
+				using (var stream = File.OpenRead(filepath))
+				{
+					fs.UploadFromStream(filepath, stream);
+				}
+			}
+		}
+
+		private void button5_Click(object sender, EventArgs e)//download
+		{
+			//var client = new MongoClient("mongodb+srv://admin:admin@cluster0.femb8.mongodb.net/group1db?retryWrites=true&w=majority");
+			var client = new MongoClient("mongodb+srv://admin:admin@cluster0.oqexz.mongodb.net/group1db?retryWrites=true&w=majority");//personal mongoDB account made to test after issues with provided one
+			var database = client.GetDatabase("group1db");
+			var fs = new GridFSBucket(database);
+			var collecFiles = database.GetCollection<BsonDocument>("fs.files");
+			var filter = Builders<GridFSFileInfo>.Filter.Regex(x => x.Filename, "*csv");
+			var list = (await cursor.ToListAsync())collecFiles.FindAsync(filter);
+			foreach (BsonDocument doc in list)
 			{ 
 				
 			}
-
-
-			//TestUploads
-			var testPath = logPath + "Output2020_09_04.json";
-
-			using (var stream = File.OpenRead(testPath))
-			{
-				//debugLabel.Text = (fs.UploadFromStream(testPath, stream)).ToString();
-			}
-
-			//collecCap.InsertOneAsync(dcmt1);
-			//collecLog.InsertOneAsync(dcmt2);
 		}
 
-		private void Form1_Load(object sender, EventArgs e)
+			private void Form1_Load(object sender, EventArgs e)
 		{
 			// load the form
 		}
