@@ -73,6 +73,7 @@
             this.label10 = new System.Windows.Forms.Label();
             this.debugLabel = new System.Windows.Forms.Label();
             this.button5 = new System.Windows.Forms.Button();
+            this.label30 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -199,6 +200,16 @@
             this.projectName.Size = new System.Drawing.Size(51, 17);
             this.projectName.TabIndex = 11;
             this.projectName.Text = "project";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label10.Location = new System.Drawing.Point(14, 9);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(42, 17);
+            this.label10.TabIndex = 12;
+            this.label10.Text = "User:";
             // 
             // label11
             // 
@@ -456,6 +467,14 @@
             this.button5.Text = "Download";
             this.button5.UseVisualStyleBackColor = true;
             this.button5.Click += new System.EventHandler(this.button5_Click);
+            // label30
+            // 
+            this.label30.AutoSize = true;
+            this.label30.Location = new System.Drawing.Point(757, 88);
+            this.label30.Name = "label30";
+            this.label30.Size = new System.Drawing.Size(41, 13);
+            this.label30.TabIndex = 38;
+            this.label30.Text = "label30";
             // 
             // MainForm
             // 
@@ -464,6 +483,7 @@
             this.AutoValidate = System.Windows.Forms.AutoValidate.EnableAllowFocusChange;
             this.ClientSize = new System.Drawing.Size(820, 523);
             this.Controls.Add(this.debugLabel);
+            this.Controls.Add(this.label30);
             this.Controls.Add(this.label29);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.label28);
@@ -556,6 +576,7 @@
 
         //Added so I can see debug values
         private System.Windows.Forms.Label debugLabel;
+        private System.Windows.Forms.Label label30;
     }
 }
 

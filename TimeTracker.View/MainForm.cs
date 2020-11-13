@@ -3,9 +3,12 @@ using MongoDB.Driver.GridFS;
 using MongoDB.Bson;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -38,6 +41,16 @@ namespace TimeTracker.View
 		string _prevPs = string.Empty; //previous psName
 		string _prevUrl = string.Empty; //previous URL
 
+		private bool _lastInputMethod = false; // true if keyboard, false if mouse/just instantiated
+		private DateTime _lastInputTime = DateTime.MaxValue;
+		private IntPtr _keyboardHookID = IntPtr.Zero;
+		private IntPtr _mouseHookID = IntPtr.Zero;
+		private LowLevelKeyboardMouseProc _llKbDelegate;
+		private LowLevelKeyboardMouseProc _llMouseDelegate;
+		private int _inputWaitTime = 2; // Amount of time to wait inbetween inputs before capturing a screenshot
+		private Keys[] _keysListening = {Keys.Tab, Keys.Enter};
+		private IntPtr[] _mouseEventsListening = { (IntPtr)0x0201, (IntPtr)0x0204 }; // Left mouse down, right mouse down
+
 		Stopwatch _stopwatch = new Stopwatch();
 		TimeSpan _ts = new TimeSpan();
 		private string screenshot;
@@ -60,6 +73,9 @@ namespace TimeTracker.View
 				CenterToScreen();
 				HideLabels();
 
+				// keyboard listening hook
+				CreateLLKeyboardHook();
+				CreateLLMouseHook();
 
 				//polling thread
 				Thread pollingThread;
@@ -67,16 +83,80 @@ namespace TimeTracker.View
 				pollingThread.IsBackground = true;
 				pollingThread.Start();
 
-				//idle monitor
-				Thread idleMonitor;
-				idleMonitor = new Thread(StartIdleMonitoring);
-				idleMonitor.IsBackground = true;
-				idleMonitor.Start();
-			}
+                //idle monitor
+                Thread idleMonitor;
+                idleMonitor = new Thread(StartIdleMonitoring);
+                idleMonitor.IsBackground = true;
+                idleMonitor.Start();
+            }
 			catch (Exception e)
 			{
 				MessageBox.Show(e.StackTrace);
 			}
+		}
+
+		// low level keyboard hook creation
+		private void CreateLLKeyboardHook()
+        {
+			label30.Text = "Key press";
+			_llKbDelegate = KeyboardHookCallback;
+			using (Process curProcess = Process.GetCurrentProcess())
+			using (ProcessModule curModule = curProcess.MainModule)
+			{
+				_keyboardHookID = SetWindowsHookEx(13, _llKbDelegate, GetModuleHandle(curModule.ModuleName), 0);
+			}
+		}
+
+		// low level mouse hook creation
+		private void CreateLLMouseHook()
+		{
+			_llMouseDelegate = MouseHookCallback;
+			using (Process curProcess = Process.GetCurrentProcess())
+			using (ProcessModule curModule = curProcess.MainModule)
+			{
+				_mouseHookID = SetWindowsHookEx(14, _llMouseDelegate, GetModuleHandle(curModule.ModuleName), 0);
+			}
+		}
+
+		// Call back whenever keyboard events occur
+		private IntPtr KeyboardHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
+        {
+			// Capture a screenshot on keyboard push down on keys specified in _keysListening
+			if (nCode >= 0 && wParam == (IntPtr)0x0100)
+			{
+				Keys vkCode = (Keys)Marshal.ReadInt32(lParam);
+				if (_keysListening.Contains(vkCode))
+				{
+					label30.Text = vkCode.ToString();
+					CaptureCurrentWindow(_psName, _winTitle);
+				}
+			}
+			// Capture a screenshot if the last input was a mouse AND _inputWaitTime seconds have passed since it has been used
+			else if (!_lastInputMethod && (_lastInputTime - DateTime.UtcNow).TotalSeconds > _inputWaitTime) 
+			{
+				CaptureCurrentWindow(_psName, _winTitle);
+			}
+			_lastInputMethod = true;
+			_lastInputTime = DateTime.UtcNow;
+			return CallNextHookEx(_keyboardHookID, nCode, wParam, lParam);
+		}
+
+		// Call back whenever mouse events occur
+		private IntPtr MouseHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
+		{
+			// Capture a screenshot when event defined in _mouseEventsListening
+			if (nCode >= 0 && (_mouseEventsListening.Contains(wParam)))
+			{
+				CaptureCurrentWindow(_psName, _winTitle);
+			}
+			// Capture a screenshot if the last input was a keyboard AND _inputWaitTime seconds have passed since it has been used
+			else if (_lastInputMethod && (_lastInputTime - DateTime.UtcNow).TotalSeconds > _inputWaitTime)
+			{
+				CaptureCurrentWindow(_psName, _winTitle);
+			}
+			_lastInputMethod = false;
+			_lastInputTime = DateTime.UtcNow;
+			return CallNextHookEx(_mouseHookID, nCode, wParam, lParam);
 		}
 
 		//thread to poll
@@ -108,9 +188,10 @@ namespace TimeTracker.View
 						_prevPs = _psName;
 						_prevUrl = _url;
 
-						label1.Text = _prevTitle;
-						label2.Text = _prevPs;
-						label4.Text = _prevUrl;
+						UpdateInvoke(label1, delegate () { label1.Text = _prevTitle; });
+						UpdateInvoke(label2, delegate () { label2.Text = _prevPs; });
+						UpdateInvoke(label4, delegate () { label4.Text = _prevUrl; });
+						
 					}
 				} //end while
 			}
@@ -148,7 +229,8 @@ namespace TimeTracker.View
 			}
 
 			_i++;
-			label7.Text = _i.ToString();
+			UpdateInvoke(label7, delegate () { label7.Text = _i.ToString(); });
+			
 
 			Global.dictionaryEvents[e].entryId = Guid.NewGuid().ToString();
 
@@ -175,23 +257,23 @@ namespace TimeTracker.View
 			idt.ts = _ts;
 			idt.entryId = "";
 
-			label28.Text = _idleSeconds.ToString(CultureInfo.InvariantCulture);
-
+			UpdateInvoke(label28, delegate () { label28.Text = _idleSeconds.ToString(CultureInfo.InvariantCulture); });
+			
 			_idleFreeze = Math.Floor(_idleSeconds);
 			
 			if (_idleFreeze > 0)
 			{
-				label19.Text = _prevPs;
-				label20.Text = idt.ts.TotalSeconds.ToString(CultureInfo.InvariantCulture);
-				label21.Text = _idleFreeze.ToString(CultureInfo.InvariantCulture);
+				UpdateInvoke(label19, delegate () { label19.Text = _prevPs; });
+				UpdateInvoke(label20, delegate () { label20.Text = idt.ts.TotalSeconds.ToString(CultureInfo.InvariantCulture); });
+				UpdateInvoke(label21, delegate () { label21.Text = _idleFreeze.ToString(CultureInfo.InvariantCulture); });
 
 				if ((idt.ts.TotalSeconds - _idleFreeze) < 0) //error, when idle time is more than duration
 				{
 					ProcessInfo.GetAll(out _, out var ps, out _);
-					label24.Text = ps;
+					UpdateInvoke(label24, delegate () { label24.Text = ps; });
 
 					_k++;
-					label29.Text = "Idle error occured# " + _k;
+					UpdateInvoke(label29, delegate () { label29.Text = "Idle error occured# " + _k; });
 
 					idt.idle = TimeSpan.FromSeconds(0.0);
 				}
@@ -338,14 +420,15 @@ namespace TimeTracker.View
 
 			if (newItem == 1) //add list item
 			{
-				listView1.Items.Add(lv);
-				Global.dictionaryEvents[e].listId = listView1.Items.IndexOf(lv);
+				UpdateInvoke(listView1, delegate () { listView1.Items.Add(lv); });
+				UpdateInvoke(listView1, delegate () { Global.dictionaryEvents[e].listId = listView1.Items.IndexOf(lv); });
+				
 			}
 			else //update list item
 			{
-				listView1.Items[Global.dictionaryEvents[e].listId].SubItems[2].Text = elapsedTime;
-				listView1.Items[Global.dictionaryEvents[e].listId].SubItems[3].Text = idledTime;
-				listView1.Items[Global.dictionaryEvents[e].listId].SubItems[5].Text = activeTime;
+				UpdateInvoke(listView1, delegate () { listView1.Items[Global.dictionaryEvents[e].listId].SubItems[2].Text = elapsedTime; });
+				UpdateInvoke(listView1, delegate () { listView1.Items[Global.dictionaryEvents[e].listId].SubItems[3].Text = idledTime; });
+				UpdateInvoke(listView1, delegate () { listView1.Items[Global.dictionaryEvents[e].listId].SubItems[5].Text = activeTime; });
 			}
 		}
 
@@ -382,20 +465,19 @@ namespace TimeTracker.View
 			var activeTotal = $"{Global.activeTotal.Hours:00}:{Global.activeTotal.Minutes:00}:{Global.activeTotal.Seconds:00}";
 
 			listView2.Items[listId].SubItems[1].Text = newActiveFormatted;
-			label17.Text = activeTotal;
+			UpdateInvoke(label17, delegate () { label17.Text = activeTotal; });
 		}
 
 		private void StartIdleMonitoring()
 		{
 			Console.WriteLine("Idle monitoring...");
 
-			// TODO: will blow up if running as Debug mode within VS and try to record itself. Find out why
 			var captured = false;
 			const int idleSecondElapsedToCapture = 3;
 
 			while (true)
 			{
-				Thread.Sleep(50);
+				Task.Delay(50).Wait();
 
 				if (_idleSeconds < 1)
 				{
@@ -438,28 +520,45 @@ namespace TimeTracker.View
 					}
 				}
 
-				if (_idleDebug == 1)
-				{
-					label14.Text = _idleSeconds.ToString(CultureInfo.InvariantCulture);
-					label8.Text = _stopwatch.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture);
-					label22.Text = "idled at    " + _idledAt.ToString(CultureInfo.InvariantCulture);
-					label23.Text = "cont. from    " + _idleContinued.ToString(CultureInfo.InvariantCulture);
-					label25.Text = _seconds.ToString();
-				}
-				else
-				{
-					label14.Text = ((int)_idleSeconds).ToString();
-				}
+				UpdateIdleDebugText();
 
 			}
 
 		}
 
+		private void UpdateInvoke(ISynchronizeInvoke invoke, Action action)
+        {
+			if (!invoke.InvokeRequired)
+            {
+				action();
+            }
+			else
+            {
+				invoke.Invoke(action, new object[] { });
+            }
+        }
+
+		private void UpdateIdleDebugText()
+        {
+			if (_idleDebug == 1)
+			{
+				UpdateInvoke(label14, delegate () { label14.Text = _idleSeconds.ToString(CultureInfo.InvariantCulture); });
+				UpdateInvoke(label8, delegate () { label8.Text = _stopwatch.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture); });
+				UpdateInvoke(label22, delegate () { label22.Text = "idled at    " + _idledAt.ToString(CultureInfo.InvariantCulture); });
+				UpdateInvoke(label23, delegate () { label23.Text = "cont. from    " + _idleContinued.ToString(CultureInfo.InvariantCulture); });
+				UpdateInvoke(label25, delegate () { label25.Text = _seconds.ToString(); });
+			}
+			else
+			{
+				UpdateInvoke(label14, delegate() { label14.Text = ((int)_idleSeconds).ToString(); });
+			}
+		}
+
 		private void ResetIdle()
 		{
 			_j++;
-			label26.Text = "RESET# " + _j.ToString();
-			label27.Text = _prevPs;
+			UpdateInvoke(label26, delegate () { label26.Text = "RESET# " + _j.ToString(); });
+			UpdateInvoke(label27, delegate () { label27.Text = _prevPs; });
 			_idling = false;
 			_idleSeconds = 0;
 			_idleContinued = 0;
@@ -484,6 +583,7 @@ namespace TimeTracker.View
 				label28.Visible = false;
 				label29.Visible = false;
 				debugLabel.Visible = false;
+				label30.Visible = false;
 			}
 			else
 			{
@@ -501,6 +601,7 @@ namespace TimeTracker.View
 				label28.Visible = true;
 				label29.Visible = true;
 				debugLabel.Visible = true;
+				label30.Visible = true;
 			}
 		}
 
@@ -576,5 +677,24 @@ namespace TimeTracker.View
 		{
 			// load the form
 		}
+
+		private delegate void SafeCallDelegate(string text);
+
+		private delegate IntPtr LowLevelKeyboardMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
+
+		[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+		private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelKeyboardMouseProc lpfn, IntPtr hMod, uint dwThreadId);
+
+
+		[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		private static extern bool UnhookWindowsHookEx(IntPtr hhk);
+
+		[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+		private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
+
+
+		[DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]		
+		private static extern IntPtr GetModuleHandle(string lpModuleName);
 	}
 }
