@@ -1,4 +1,7 @@
-﻿using System;
+﻿using MongoDB.Driver;
+using MongoDB.Driver.GridFS;
+using MongoDB.Bson;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -7,6 +10,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TimeTracker.View.EventReport.Consumer;
+using MongoDB.Bson.IO;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
+using System.Windows.Forms.VisualStyles;
 
 namespace TimeTracker.View
 {
@@ -476,6 +483,7 @@ namespace TimeTracker.View
 				label27.Visible = false;
 				label28.Visible = false;
 				label29.Visible = false;
+				debugLabel.Visible = false;
 			}
 			else
 			{
@@ -492,6 +500,7 @@ namespace TimeTracker.View
 				label27.Visible = true;
 				label28.Visible = true;
 				label29.Visible = true;
+				debugLabel.Visible = true;
 			}
 		}
 
@@ -509,7 +518,61 @@ namespace TimeTracker.View
 			}
 		}
 
-		private void Form1_Load(object sender, EventArgs e)
+		private void button3_Click(object sender, EventArgs e)//This is the upload button- use string[] GetFiles(string path) to get files in folder
+		{
+			//var client = new MongoClient("mongodb+srv://admin:admin@cluster0.femb8.mongodb.net/group1db?retryWrites=true&w=majority");
+			var client = new MongoClient("mongodb+srv://admin:admin@cluster0.oqexz.mongodb.net/group1db?retryWrites=true&w=majority");//personal mongoDB account made to test after issues with provided one
+			var database = client.GetDatabase("group1db");
+			var fs = new GridFSBucket(database);
+			//FilePathString
+			var userpath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+			var logPath = userpath + "/Logs/";
+			foreach (String filePath in Directory.GetFiles(logPath))//iterate over every file in log folder, returns full path of files
+			{
+				using (var stream = File.OpenRead(filePath))
+				{
+					int index = filePath.IndexOf("/Logs/");
+;					string filename = filePath.Substring(index+6);
+					fs.UploadFromStream(filename, stream);
+				}
+			}
+			var capPath = userpath + "/Captures/";
+			foreach (String filePath in Directory.GetFiles(capPath))//iterate over every file in captures folder, returns full file path
+			{
+				using (var stream = File.OpenRead(filePath))
+				{
+					int index = filePath.IndexOf("/Captures/");
+					string filename = filePath.Substring(index + 10);
+					fs.UploadFromStream(filename, stream);
+				}
+			}
+			debugLabel.Text = "Upload Complete";
+		}
+
+		private void button5_Click(object sender, EventArgs e)//download
+		{
+			//var client = new MongoClient("mongodb+srv://admin:admin@cluster0.femb8.mongodb.net/group1db?retryWrites=true&w=majority");
+			var client = new MongoClient("mongodb+srv://admin:admin@cluster0.oqexz.mongodb.net/group1db?retryWrites=true&w=majority");//personal mongoDB account made to test after issues with provided one
+			var database = client.GetDatabase("group1db");
+			var fs = new GridFSBucket(database);
+			//var collecFiles = database.GetCollection<BsonDocument>("fs.files");
+			var filter = Builders<GridFSFileInfo>.Filter.And(Builders<GridFSFileInfo>.Filter.Regex(x => x.Filename, "csv"));
+			var list =  fs.Find(filter).ToList();
+			var userpath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+			var endpath = userpath + "/Analysis/";
+			Directory.CreateDirectory(endpath);
+			foreach (GridFSFileInfo doc in list)
+			{
+				string path = endpath + doc.Filename;
+				using (var stream = File.OpenWrite(path))
+				{
+					fs.DownloadToStream(doc.Id, stream);
+				}
+			}
+			debugLabel.Text = "Download Complete";
+		}
+
+			private void Form1_Load(object sender, EventArgs e)
 		{
 			// load the form
 		}

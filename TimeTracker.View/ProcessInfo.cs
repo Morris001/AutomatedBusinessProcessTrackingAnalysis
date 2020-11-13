@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
-namespace TimeTracker.View
+namespace TimeTracker.View //This class gets process info as well as takes screenshots
 {
 	class ProcessInfo
 	{
