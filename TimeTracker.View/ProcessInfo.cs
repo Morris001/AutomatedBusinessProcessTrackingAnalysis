@@ -138,7 +138,11 @@ namespace TimeTracker.View
 				.FirstOrDefault(p => p.ProcessName.Equals(applicationName) && p.MainWindowTitle.Equals(windowsTitle));
 
 			// build window from process
-			var handle = process.MainWindowHandle;
+			var handle = IntPtr.Zero;
+			if (process != null)
+            {
+				handle = process.MainWindowHandle;
+            }
 			var window = GetClientRect(handle);
 
 			// calculate offset
@@ -147,22 +151,28 @@ namespace TimeTracker.View
 			window.X = leftPoint.X;
 			window.Y = leftPoint.Y;
 
-			// print screen
-			using (var bitmap = new Bitmap(window.Width, window.Height))
-			{
-				using (var g = Graphics.FromImage(bitmap))
+			// print screen if the window size larger than 0x0
+			if (window.Height > 0 && window.Width > 0)
+            {
+				using (var bitmap = new Bitmap(window.Width, window.Height))
 				{
-					g.CopyFromScreen(window.X, window.Y, 0, 0, new Size(window.Width, window.Height));
+					using (var g = Graphics.FromImage(bitmap))
+					{
+						g.CopyFromScreen(window.X, window.Y, 0, 0, new Size(window.Width, window.Height));
+					}
+
+					fileName = Path.Combine(filePath, $"{fileName}.jpeg");
+
+					Console.WriteLine($"Captured to {fileName}");
+
+					bitmap.Save(fileName, ImageFormat.Jpeg);
 				}
 
-				fileName = Path.Combine(filePath, $"{fileName}.jpeg");
-
-				Console.WriteLine($"Captured to {fileName}");
-
-				bitmap.Save(fileName, ImageFormat.Jpeg);
+				return Path.GetFullPath(fileName);
 			}
 
-			return Path.GetFullPath(fileName);
+			// Otherwise return failed to capture
+			return "Failed to capture";
 		}
 
 		public static void CaptureEntireWindowScreenShot(string filePath, string fileName, ImageFormat format)
