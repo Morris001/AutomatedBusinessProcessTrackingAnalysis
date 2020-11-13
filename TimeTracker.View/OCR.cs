@@ -3,43 +3,50 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Net;
-
+using System.Text;
 
 namespace TimeTracker.View
 {
     class OCR
     {
-        public string Get(string uri)
+        public static string Get(string uri,string image)
         {
+            
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+            request.Method = "POST";
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
+            var postData = "apikey=helloworld";
+            postData += "&base64Image=" + image;
+            var data = Encoding.ASCII.GetBytes(postData);
+            request.ContentType = "application/x-www-form-urlencoded";
+            request.ContentLength = data.Length;
+
+            using (var stream = request.GetRequestStream())
+            {
+                stream.Write(data, 0, data.Length);
+            }
+            var response = (HttpWebResponse)request.GetResponse();
+
+            //using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+            //using (Stream stream = response.GetResponseStream())
+            using (StreamReader reader = new StreamReader(response.GetResponseStream()))
             {
                 return reader.ReadToEnd();
             }
         }
 
-        public string OCRSpace_API_Call()           // OCR_Space  API  (Image to Text)
+        public static string OCRSpace_API_Call(string image)           // OCR_Space  API  (Image to Text)
         {
-
-            var imageUpload = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);    //  Uploads the image from the file location
-            int count = 1;
-            count++;
             
-            string uri = $"https://api.ocr.space/parse/imageurl?apikey=helloworld&url={imageUpload}";           // {imageUri}";
-            string responseString = Get(uri);             //       WebUtilities.DoGetRequest(uri);
+            string uri = $"https://api.ocr.space/parse/image";           // {imageUri}";
+            string responseString = Get(uri,image);             //       WebUtilities.DoGetRequest(uri);
 
             //OcrSpaceResult result = JsonConvert.DeserializeObject<OcrSpaceResult>(responseString);      //  This returns the JSON object (In Theory)
 
             //if ((!Result.IsErroredOnProcessing) && !String.IsNullOrEmpty(result.ParsedResults[0].ParsedText))
             // return result.ParsedResults[0].ParsedText;
-
-            System.IO.File.WriteAllText(@"C:\SE\OCRTestFolder\WriteText{count}.txt", responseString);
             //System.IO.File.WriteAllLines(@"C:\Users\Public\TestFolder\WriteLines.txt", lines);     //  Output to text file (For Testing Purposes)
-
             return responseString;     //  Returns the OCR Text results as a string value
         }
     }
