@@ -14,3 +14,11 @@ This is an enhancement of a previous iteration of this project where this group 
   
   
 We utilized Visual Studio and C# to work on this project, and it works locally if you pull this repo and run the "start without debugging" command and are delivering a runnable .msi to Fellows Consulting Group.
+
+### Senior Design Project: Fall 2020
+-MongoDB Data Storage
+	Uses Johan Terblanche's MongoDB Account and a database provided to store files.
+
+To create MSI make sure that the Microsoft Visual Studio Installer Projects extension is installed.
+
+The thread safety issues that made it so that it would only run in "start without debugging" have been addressed.

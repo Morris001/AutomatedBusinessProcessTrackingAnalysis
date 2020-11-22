@@ -44,10 +44,7 @@
             this.label5 = new System.Windows.Forms.Label();
             this.userName = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
             this.projectName = new System.Windows.Forms.Label();
-            this.label10 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.button3 = new System.Windows.Forms.Button();
             this.workspaceLabel = new System.Windows.Forms.Label();
@@ -73,7 +70,11 @@
             this.label28 = new System.Windows.Forms.Label();
             this.button4 = new System.Windows.Forms.Button();
             this.label29 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.debugLabel = new System.Windows.Forms.Label();
+            this.button5 = new System.Windows.Forms.Button();
             this.label30 = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -190,20 +191,6 @@
             this.label7.TabIndex = 7;
             this.label7.Text = "0";
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(0, 0);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 37;
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(0, 0);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 36;
-            // 
             // projectName
             // 
             this.projectName.AutoSize = true;
@@ -214,16 +201,6 @@
             this.projectName.Size = new System.Drawing.Size(51, 17);
             this.projectName.TabIndex = 11;
             this.projectName.Text = "project";
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.Location = new System.Drawing.Point(14, 9);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(42, 17);
-            this.label10.TabIndex = 12;
-            this.label10.Text = "User:";
             // 
             // label11
             // 
@@ -237,10 +214,13 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(0, 0);
+            this.button3.Location = new System.Drawing.Point(730, 134);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(75, 23);
             this.button3.TabIndex = 35;
+            this.button3.Text = "Upload";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // workspaceLabel
             // 
@@ -449,6 +429,36 @@
             this.label29.Size = new System.Drawing.Size(0, 13);
             this.label29.TabIndex = 34;
             // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label10.Location = new System.Drawing.Point(16, 11);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(42, 17);
+            this.label10.TabIndex = 12;
+            this.label10.Text = "User:";
+            // 
+            // debugLabel
+            // 
+            this.debugLabel.AutoSize = true;
+            this.debugLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.debugLabel.Location = new System.Drawing.Point(22, 164);
+            this.debugLabel.Name = "debugLabel";
+            this.debugLabel.Size = new System.Drawing.Size(153, 17);
+            this.debugLabel.TabIndex = 12;
+            this.debugLabel.Text = "Default, no value given";
+            // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(730, 102);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(75, 23);
+            this.button5.TabIndex = 35;
+            this.button5.Text = "Download";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
             // label30
             // 
             this.label30.AutoSize = true;
@@ -458,12 +468,24 @@
             this.label30.TabIndex = 38;
             this.label30.Text = "label30";
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(615, 170);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 39;
+            this.button1.Text = "OCR";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoValidate = System.Windows.Forms.AutoValidate.EnableAllowFocusChange;
             this.ClientSize = new System.Drawing.Size(820, 523);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.debugLabel);
             this.Controls.Add(this.label30);
             this.Controls.Add(this.label29);
             this.Controls.Add(this.button4);
@@ -487,11 +509,10 @@
             this.Controls.Add(this.label13);
             this.Controls.Add(this.workspaceLabel);
             this.Controls.Add(this.button3);
+            this.Controls.Add(this.button5);
             this.Controls.Add(this.label11);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.projectName);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.userName);
             this.Controls.Add(this.label5);
@@ -523,11 +544,8 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label userName;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
         private System.Windows.Forms.ColumnHeader columnHeader5;
         private System.Windows.Forms.Label projectName;
-        private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Label workspaceLabel;
@@ -553,8 +571,16 @@
         private System.Windows.Forms.Label label27;
         private System.Windows.Forms.Label label28;
         private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Label label29;
+        //private System.Windows.Forms.Button button1;
+        //private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Label label10;
+
+        //Added so I can see debug values
+        private System.Windows.Forms.Label debugLabel;
         private System.Windows.Forms.Label label30;
+        private System.Windows.Forms.Button button1;
     }
 }
 
