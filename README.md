@@ -17,4 +17,8 @@ We utilized Visual Studio and C# to work on this project, and it works locally i
 
 ### Senior Design Project: Fall 2020
 -MongoDB Data Storage
-	Uses Dr. Hill's MongoDB Account and a database provided to store files.
+	Uses Johan Terblanche's MongoDB Account and a database provided to store files.
+
+To create MSI make sure that the Microsoft Visual Studio Installer Projects extension is installed.
+
+The thread safety issues that made it so that it would only run in "start without debugging" have been addressed.
