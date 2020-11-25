@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 
 
-namespace Time.View
+namespace TimeTracker.View
 {
     class Analysis
     {
@@ -22,17 +22,13 @@ namespace Time.View
         public string Active { get; set; }
         public string ScreenShot { get; set; }
 
-        static void Main(string[] args)
-        {
-            LoadJson();
-        }
 
         public static void LoadJson()
         {
             var userpath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             var logPath = userpath + "/Analysis/";
 
-            using (StreamReader r = new StreamReader("/Users/salwahaider/Desktop/AutomatedBusinessProcessTrackingAnalysis-GDrive_upload/Output2020_11_13.json"))
+            using (StreamReader r = new StreamReader(Directory.GetFiles(logPath)[1]))
             {
                 var json = r.ReadToEnd();
                 var items = JsonConvert.DeserializeObject<List<Analysis>>(json);
@@ -74,159 +70,3 @@ namespace Time.View
         }
     }
 }
-
-
-/*public class SimpleAnalysis
-{
-    [ColumnName("Timestamp"), LoadColumn(0)]
-    public string TimeStamp { get; set; }
-
-    [ColumnName("Duration"), LoadColumn(1)]
-    public string Duration { get; set; }
-
-    [ColumnName("Active"), LoadColumn(2)]
-    public string Active { get; set; }
-
-    [ColumnName("Idle"), LoadColumn(3)]
-    public string Idle { get; set; }
-
-}
-
-public class DataPrediction
-{
-    [ColumnName("Predicted Table")]
-    public bool Prediction { get; set; }
-
-}
-*/
-
-/*using System;
-using System.IO;
-using System.Data;
-using System.Collections.Generic;
-using Newtonsoft.Json;
-using Microsoft.ML.Data;
-using Microsoft.ML;
-using XPlot.Plotly;
-using MongoDB.Bson.IO;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
-using System.Windows.Forms.VisualStyles;
-using MongoDB.Driver;
-using MongoDB.Driver.GridFS;
-using MongoDB.Bson;
-
-namespace TimeTracker.View
-{
-    class Analysis
-    {
-        List<Analyze> items = new List<Analyze>();
-        //string path = "/Users/salwahaider/Desktop/AutomatedBusinessProcessTrackingAnalysis-GDrive_upload/Output2020_11_13.json";
-
-        static void Main(string[] args)
-        {
-            LoadJson();
-        }
-
-        public class Analyze
-        {
-            public string TimeStamp { get; set; }
-            public string Id { get; set; }
-            public string OS { get; set; }
-            public string Process { get; set; }
-            public string Url { get; set; }
-            public string Title { get; set; }
-            public string Duration { get; set; }
-            public string Idle { get; set; }
-            public string Active { get; set; }
-            public string ScreenShot { get; set; }
-
-            //public override string ToString()
-            //{
-            //   return $"{TimeStamp}, {Id}, {Duration}, {Active}";
-            //}
-        }
-
-        public static void LoadJson()
-        {
-            var client = new MongoClient("mongodb+srv://admin:admin@cluster0.oqexz.mongodb.net/group1db?retryWrites=true&w=majority");
-            var database = client.GetDatabase("group1db");
-            var fs = new GridFSBucket(database);
-            var collecFiles = database.GetCollection<BsonDocument>("fs.files");
-            var filter = Builders<GridFSFileInfo>.Filter.And(Builders<GridFSFileInfo>.Filter.Regex(x => x.Filename, "json"));
-            var list = fs.Find(filter).ToList(); //all json files stored
-            var userpath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            var analysisPath = userpath + "/Analysis/";
-            //var files = Directory.GetFiles(analysisPath);
-
-            foreach (String filePath in Directory.GetFiles(analysisPath))
-            {
-                JsonTextReader reader = new JsonTextReader(new StreamReader(filePath));
-                using (var stream = File.OpenRead(filePath))
-                {
-                    int index = filePath.IndexOf("/Analysis/");
-                    string filename = filePath.Substring(index + 10);
-                    var content = reader.Read();
-                    var items = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Analysis>>(content);
-
-                    foreach (var item in items)
-                    {
-
-                    }
-            }
-
-
-        /*public static void LoadJson()
-        {
-            var client = new MongoClient("mongodb+srv://admin:admin@cluster0.oqexz.mongodb.net/group1db?retryWrites=true&w=majority");//personal mongoDB account made to test after issues with provided one
-            var database = client.GetDatabase("group1db");
-            var fs = new GridFSBucket(database);
-            var userpath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            var logPath = userpath + "/Analysis/";
-
-            foreach (String filePath in Directory.GetFiles(logPath))
-            {
-                using (StreamReader r = new StreamReader(filePath))
-                {
-                    var json = r.ReadToEnd();
-                    var items = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Analysis>>(json);
-                }
-            }
-
-            var capPath = userpath + "/Analysis/";
-
-            using (var stream = File.OpenRead(filePath))
-            Console.WriteLine("{0} {1}", "TimeStamp", "Duration");
-                foreach (var item in items)
-                {
-                    Console.WriteLine("{0} {1}", item.TimeStamp, item.Duration);
-                }
-            }
-        }
-    }
-    /*
-}
-
-public class SimpleAnalysis
-{
-    [ColumnName("Timestamp"), LoadColumn(0)]
-    public string TimeStamp { get; set; }
-
-    [ColumnName("Duration"), LoadColumn(1)]
-    public string Duration { get; set; }
-
-    [ColumnName("Active"), LoadColumn(2)]
-    public string Active { get; set; }
-
-    [ColumnName("Idle"), LoadColumn(3)]
-    public string Idle { get; set; }
-
-}
-
-public class DataPrediction
-{
-    [ColumnName("Predicted Table")]
-    public bool Prediction { get; set; }
-
-}
-*/

@@ -671,6 +671,7 @@ namespace TimeTracker.View
 					fs.DownloadToStream(doc.Id, stream);
 				}
 			}
+			//Analysis.LoadJson();
 			debugLabel.Text = "Download Complete";
 		}
 		private void button1_Click(object sender, EventArgs e)//OCR BUTTON
