@@ -7,6 +7,10 @@ using System.Text;
 
 namespace TimeTracker.View
 {
+
+    //NOTE: Windows seems to have its own OCR api. This is making HTTP calls to a third-party api and returning 403s. We need to do client-side processing for
+    //Faster results and not depend on other peoples' APIs. See: https://medium.com/dataseries/using-windows-10-built-in-ocr-with-c-b5ca8665a14e
+    //https://docs.microsoft.com/en-us/samples/microsoft/windows-universal-samples/ocr/
     class OCR
     {
         public static string Get(string uri,string image)
