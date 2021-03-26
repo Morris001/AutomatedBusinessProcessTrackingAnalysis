@@ -159,6 +159,9 @@
       <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20505.0\lib\net40\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="Tesseract, Version=4.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Tesseract.4.1.1\lib\net45\Tesseract.dll</HintPath>
+    </Reference>
     <Reference Include="Ubiety.Dns.Core, Version=2.2.1.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <HintPath>..\packages\MySql.Data.8.0.19\lib\net452\Ubiety.Dns.Core.dll</HintPath>
     </Reference>
@@ -239,7 +242,9 @@
     <Error Condition="!Exists('..\packages\Selenium.Chrome.WebDriver.79.0.0\build\Selenium.Chrome.WebDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Selenium.Chrome.WebDriver.79.0.0\build\Selenium.Chrome.WebDriver.targets'))" />
     <Error Condition="!Exists('..\packages\MongoDB.Libmongocrypt.1.0.0\build\MongoDB.Libmongocrypt.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MongoDB.Libmongocrypt.1.0.0\build\MongoDB.Libmongocrypt.targets'))" />
     <Error Condition="!Exists('..\packages\MongoDB.Driver.Core.2.11.3\build\MongoDB.Driver.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MongoDB.Driver.Core.2.11.3\build\MongoDB.Driver.Core.targets'))" />
+    <Error Condition="!Exists('..\packages\Tesseract.4.1.1\build\Tesseract.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Tesseract.4.1.1\build\Tesseract.targets'))" />
   </Target>
   <Import Project="..\packages\MongoDB.Libmongocrypt.1.0.0\build\MongoDB.Libmongocrypt.targets" Condition="Exists('..\packages\MongoDB.Libmongocrypt.1.0.0\build\MongoDB.Libmongocrypt.targets')" />
   <Import Project="..\packages\MongoDB.Driver.Core.2.11.3\build\MongoDB.Driver.Core.targets" Condition="Exists('..\packages\MongoDB.Driver.Core.2.11.3\build\MongoDB.Driver.Core.targets')" />
+  <Import Project="..\packages\Tesseract.4.1.1\build\Tesseract.targets" Condition="Exists('..\packages\Tesseract.4.1.1\build\Tesseract.targets')" />
 </Project>
