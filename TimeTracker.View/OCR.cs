@@ -7,11 +7,13 @@ using System.Text;
 
 namespace TimeTracker.View
 {
+    //Wrapper used: https://github.com/charlesw/tesseract/
+    //Sample code: https://github.com/charlesw/tesseract-samples
     class OCR
     {
-        public static string Get(string uri,string image)
+        public static string Get(string uri, string image)
         {
-            
+
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
             request.Method = "POST";
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
@@ -36,11 +38,12 @@ namespace TimeTracker.View
             }
         }
 
+
         public static string OCRSpace_API_Call(string image)           // OCR_Space  API  (Image to Text)
         {
-            
+
             string uri = $"https://api.ocr.space/parse/image";           // {imageUri}";
-            string responseString = Get(uri,image);             //       WebUtilities.DoGetRequest(uri);
+            string responseString = Get(uri, image);             //       WebUtilities.DoGetRequest(uri);
 
             //OcrSpaceResult result = JsonConvert.DeserializeObject<OcrSpaceResult>(responseString);      //  This returns the JSON object (In Theory)
 
