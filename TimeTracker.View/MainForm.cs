@@ -23,6 +23,7 @@ namespace TimeTracker.View
 {
 	public partial class MainForm : Form
 	{
+		String userpath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 		int _idleDebug = 0;
 
 		private const uint MinIdleSeconds = 3; //minimum seconds that trips the idle counter
@@ -205,8 +206,7 @@ namespace TimeTracker.View
 
 		private string CaptureCurrentWindow(string applicationName, string windowName)
 		{
-			var userpath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-			var path = userpath + "/Captures/";
+			var path = this.userpath + "/Captures/";
 			var today = DateTime.Now;
 			var fileName = $"{_psName}_{today:yyyyMMddhhmmss}";
 
@@ -374,9 +374,7 @@ namespace TimeTracker.View
 		{
 			var report = new Report(e, Global.dictionaryEvents[e], _winTitle, screenshot);
 			var today = DateTime.Now.Date.ToString("yyyy_MM_dd");
-			// add environment variable to get user path
-			var userpath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-			var path = userpath + "/Logs/";
+			var path = this.userpath + "/Logs/";
 			Directory.CreateDirectory(path);
 			string reportName;
 
@@ -627,8 +625,7 @@ namespace TimeTracker.View
 			var database = client.GetDatabase("group1db");
 			var fs = new GridFSBucket(database);
 			//FilePathString
-			var userpath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-			var logPath = userpath + "/Logs/";
+			var logPath = this.userpath + "/Logs/";
 			foreach (String filePath in Directory.GetFiles(logPath))//iterate over every file in log folder, returns full path of files
 			{
 				using (var stream = File.OpenRead(filePath))
@@ -638,7 +635,7 @@ namespace TimeTracker.View
 					fs.UploadFromStream(filename, stream);
 				}
 			}
-			var capPath = userpath + "/Captures/";
+			var capPath = this.userpath + "/Captures/";
 			foreach (String filePath in Directory.GetFiles(capPath))//iterate over every file in captures folder, returns full file path
 			{
 				using (var stream = File.OpenRead(filePath))
@@ -660,8 +657,7 @@ namespace TimeTracker.View
 			//var collecFiles = database.GetCollection<BsonDocument>("fs.files");
 			var filter = Builders<GridFSFileInfo>.Filter.And(Builders<GridFSFileInfo>.Filter.Regex(x => x.Filename, "csv"));
 			var list =  fs.Find(filter).ToList();
-			var userpath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-			var endpath = userpath + "/Analysis/";
+			var endpath = this.userpath + "/Analysis/";
 			Directory.CreateDirectory(endpath);
 			foreach (GridFSFileInfo doc in list)
 			{
@@ -674,17 +670,16 @@ namespace TimeTracker.View
 			//Analysis.LoadJson();
 			debugLabel.Text = "Download Complete";
 		}
-		private void button1_Click(object sender, EventArgs e)//OCR BUTTON
-		{
-			var userpath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-			var capPath = userpath + "/Captures/";
+		private void button1_Click(object sender, EventArgs e) { //OCR button
+			OcrEngine ocr = new OcrEngine();
+			var capPath = this.userpath + "/Captures/";
 			var outputPath = capPath + "/OCR/";
 			Directory.CreateDirectory(outputPath);
 			foreach (String filePath in Directory.GetFiles(capPath))//iterate over every file in captures folder, returns full file path
 			{
 				byte[] imageBytes = System.IO.File.ReadAllBytes(filePath);
 				string image = Convert.ToBase64String(imageBytes);
-				string output = OCR.OCRSpace_API_Call(image);
+				string output = OcrEngine.OCRSpace_API_Call(image);
 
 				int index = filePath.IndexOf("/Captures/") +10;
 				int index2 = filePath.IndexOf(".jpeg");
