@@ -677,11 +677,11 @@ namespace TimeTracker.View
 			Directory.CreateDirectory(outputPath);
 			foreach (String filePath in Directory.GetFiles(capPath))//iterate over every file in captures folder, returns full file path
 			{
-				byte[] imageBytes = System.IO.File.ReadAllBytes(filePath);
-				string image = Convert.ToBase64String(imageBytes);
-				string output = OcrEngine.OCRSpace_API_Call(image);
+				//byte[] imageBytes = System.IO.File.ReadAllBytes(filePath);
+				//string image = Convert.ToBase64String(imageBytes);
+				string output = OcrEngine.readFromImage(image);
 
-				int index = filePath.IndexOf("/Captures/") +10;
+				int index = filePath.IndexOf("/Captures/") + 10;
 				int index2 = filePath.IndexOf(".jpeg");
 				int length = index2 - index;
 				debugLabel.Text = index.ToString() + "-" + index2.ToString();
