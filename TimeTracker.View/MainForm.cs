@@ -672,24 +672,19 @@ namespace TimeTracker.View
 		}
 		private void button1_Click(object sender, EventArgs e) { //OCR button
 			OcrEngine ocr = new OcrEngine();
-			var capPath = this.userpath + "/Captures/";
-			var outputPath = capPath + "/OCR/";
+			String folderWithScreenshotsPath = this.userpath + "/Captures/";
+			String outputPath = folderWithScreenshotsPath + "/OCR/";
 			Directory.CreateDirectory(outputPath);
-			foreach (String filePath in Directory.GetFiles(capPath))//iterate over every file in captures folder, returns full file path
-			{
-				//byte[] imageBytes = System.IO.File.ReadAllBytes(filePath);
-				//string image = Convert.ToBase64String(imageBytes);
-				string output = OcrEngine.readFromImage(image);
 
-				int index = filePath.IndexOf("/Captures/") + 10;
-				int index2 = filePath.IndexOf(".jpeg");
+			foreach (String imageFilePath in Directory.GetFiles(folderWithScreenshotsPath)) //iterate over every file in captures folder, returns full file path
+			{
+				string output = ocr.readFromImage(imageFilePath);
+				int index = imageFilePath.IndexOf("/Captures/") + 10;
+				int index2 = imageFilePath.IndexOf(".jpeg");
 				int length = index2 - index;
 				debugLabel.Text = index.ToString() + "-" + index2.ToString();
-				string path = filePath.Substring(index,length-1) + ".txt";
-				using (StreamWriter stream = new StreamWriter(outputPath+path,true))
-				{
-					stream.WriteLine(output);
-				}
+				string path = imageFilePath.Substring(index,length-1) + ".txt";
+				ocr.writeToFile(path, output);
 			}
 		}
 		private void Form1_Load(object sender, EventArgs e)

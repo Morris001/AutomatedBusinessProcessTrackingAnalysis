@@ -1,6 +1,7 @@
 using MySqlX.XDevAPI.Common;
 using Newtonsoft.Json;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -27,22 +28,29 @@ namespace TimeTracker.View
      * The read function will load an image using the filepath as an argument and perform the OCR process on it. 
      * It will then return a string, which will be passed into the writetoFile function.
      * 
-     * The writeToFile function will 
+     * The writeToFile function will write the contents to a .txt file which shares the name of the image Tesseract read the text from.
      * 
      */
     class OcrEngine
     {
-        public void readFromImage(string imagePath) // OCR_Space  API  (Image to Text)
-        {
-            //OcrSpaceResult result = JsonConvert.DeserializeObject<OcrSpaceResult>(responseString);      //  This returns the JSON object (In Theory)
+        public String readFromImage(string imagePath) { // OCR_Space  API  (Image to Text)
+            try {
+                TesseractEngine tesseractEngineInstance = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default);
+                Pix img = Pix.LoadFromFile(imagePath); //Change to var, maybe?
+                Page page = tesseractEngineInstance.Process(img);
+                String text = page.GetText();
+                return text;
+            } catch (Exception e) {
+                return ("Unable to read " + imagePath + ". Reason: " + e.ToString());
+            }
+    }
 
-            //if ((!Result.IsErroredOnProcessing) && !String.IsNullOrEmpty(result.ParsedResults[0].ParsedText))
-            // return result.ParsedResults[0].ParsedText;
+        public void writeToFile(String filepath, String text) {
+            //Open file from given filepath, insert text in it
             //System.IO.File.WriteAllLines(@"C:\Users\Public\TestFolder\WriteLines.txt", lines);     //  Output to text file (For Testing Purposes)
-        }
-
-        public void writeToFile() {
-            //Insert stuff here
+            using (StreamWriter stream = new StreamWriter(outputPath + path, true)) {
+                stream.WriteLine(output);
+            }
         }
     }
 }
