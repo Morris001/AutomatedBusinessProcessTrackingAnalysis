@@ -683,8 +683,8 @@ namespace TimeTracker.View
 				int index2 = imageFilePath.IndexOf(".jpeg");
 				int length = index2 - index;
 				debugLabel.Text = index.ToString() + "-" + index2.ToString();
-				string path = imageFilePath.Substring(index,length-1) + ".txt";
-				ocr.writeToFile(path, output);
+				string textOutputPath = imageFilePath.Substring(index,length-1) + ".txt";
+				ocr.writeToFile(textOutputPath, output);
 			}
 		}
 		private void Form1_Load(object sender, EventArgs e)
