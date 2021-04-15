@@ -673,7 +673,7 @@ namespace TimeTracker.View
 		private void button1_Click(object sender, EventArgs e) { //OCR button
 			OcrEngine ocr = new OcrEngine();
 			String folderWithScreenshotsPath = this.userpath + "/Captures/";
-			String outputPath = folderWithScreenshotsPath + "/OCR/";
+			String outputPath = folderWithScreenshotsPath + "OCR/";
 			Directory.CreateDirectory(outputPath);
 
 			foreach (String imageFilePath in Directory.GetFiles(folderWithScreenshotsPath)) //iterate over every file in captures folder, returns full file path
@@ -683,7 +683,7 @@ namespace TimeTracker.View
 				int index2 = imageFilePath.IndexOf(".jpeg");
 				int length = index2 - index;
 				debugLabel.Text = index.ToString() + "-" + index2.ToString();
-				string textOutputPath = imageFilePath.Substring(index,length-1) + ".txt";
+				string textOutputPath = outputPath + imageFilePath.Substring(index,length-1) + ".txt";
 				ocr.writeToFile(textOutputPath, output);
 			}
 		}

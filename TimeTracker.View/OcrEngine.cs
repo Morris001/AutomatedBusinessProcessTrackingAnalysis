@@ -33,9 +33,12 @@ namespace TimeTracker.View
      */
     class OcrEngine
     {
-        public String readFromImage(string imagePath) { // OCR_Space  API  (Image to Text)
+        public String readFromImage(string imagePath) { // Make this asynchronous
+            //var TESSDATA_PREFIX = ;
             try {
-                TesseractEngine tesseractEngineInstance = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default);
+                //NOTE: This filepath needs to be altered for it to work on your machine, change it to where your .tessdata folder (which contains the eng.traineddata file in this project's directory) is
+                //We need to have this installed in ProgramFiles via the .msi so there can be a fixed location.
+                TesseractEngine tesseractEngineInstance = new TesseractEngine(@"C:\DEV\AutomatedBusinessProcessTrackingAnalysis\TimeTracker.View\tessdata", "eng", EngineMode.Default);
                 Pix img = Pix.LoadFromFile(imagePath); //Change to var, maybe?
                 Page page = tesseractEngineInstance.Process(img);
                 String text = page.GetText();
@@ -45,11 +48,14 @@ namespace TimeTracker.View
             }
     }
 
-        public void writeToFile(String filepath, String text) {
-            //Open file from given filepath, insert text in it
-            //System.IO.File.WriteAllLines(@"C:\Users\Public\TestFolder\WriteLines.txt", lines);     //  Output to text file (For Testing Purposes)
-            using (StreamWriter stream = new StreamWriter(outputPath + path, true)) {
-                stream.WriteLine(output);
+        public void writeToFile(String filepath, String text) { //Should we make this asynchronous?
+
+            try {
+                if (!File.Exists(filepath)) {
+                    File.WriteAllText(filepath, text); //Shouldn't be writing to the same file more than once
+                }
+            } catch (Exception e) {
+                return; //Come up with something to do if writing to a file fails later
             }
         }
     }
