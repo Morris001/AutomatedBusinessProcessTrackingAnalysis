@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using Tesseract;
 
 namespace TimeTracker.View
@@ -33,6 +34,26 @@ namespace TimeTracker.View
      */
     class OcrEngine
     {
+        private String folderWithScreenshotsPath;
+        private String outputDirectoryPath;
+
+        public OcrEngine(String folderWithScreenshotsPath, String outputDirectoryPath) {
+            this.folderWithScreenshotsPath = folderWithScreenshotsPath;
+            this.outputDirectoryPath = outputDirectoryPath;
+        }
+
+        public void readScreenshots() {
+            foreach (String imageFilePath in Directory.GetFiles(this.folderWithScreenshotsPath)) //iterate over every file in captures folder and generate a corresponding text file in the /OCR folder
+            {
+                string output = this.readFromImage(imageFilePath);
+                int index = imageFilePath.IndexOf("/Captures/") + 10;
+                int index2 = imageFilePath.IndexOf(".jpeg");
+                int length = index2 - index;
+                string textOutputPath = this.outputDirectoryPath + imageFilePath.Substring(index, length - 1) + ".txt";
+                this.writeToFile(textOutputPath, output);
+            }
+        }
+
         public String readFromImage(string imagePath) { // Make this asynchronous
             //var TESSDATA_PREFIX = ;
             try {

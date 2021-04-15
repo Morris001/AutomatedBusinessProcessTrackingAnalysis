@@ -671,21 +671,14 @@ namespace TimeTracker.View
 			debugLabel.Text = "Download Complete";
 		}
 		private void button1_Click(object sender, EventArgs e) { //OCR button
-			OcrEngine ocr = new OcrEngine();
 			String folderWithScreenshotsPath = this.userpath + "/Captures/";
-			String outputPath = folderWithScreenshotsPath + "OCR/";
-			Directory.CreateDirectory(outputPath);
+			String outputDirectoryPath = folderWithScreenshotsPath + "OCR/";
+            OcrEngine ocrEngine = new OcrEngine(folderWithScreenshotsPath, outputDirectoryPath);
+			Directory.CreateDirectory(outputDirectoryPath);
 
-			foreach (String imageFilePath in Directory.GetFiles(folderWithScreenshotsPath)) //iterate over every file in captures folder, returns full file path
-			{
-				string output = ocr.readFromImage(imageFilePath);
-				int index = imageFilePath.IndexOf("/Captures/") + 10;
-				int index2 = imageFilePath.IndexOf(".jpeg");
-				int length = index2 - index;
-				debugLabel.Text = index.ToString() + "-" + index2.ToString();
-				string textOutputPath = outputPath + imageFilePath.Substring(index,length-1) + ".txt";
-				ocr.writeToFile(textOutputPath, output);
-			}
+			//Create thread and run OCR in that so the program doesn't lag as much
+			Thread ocrThread = new Thread(ocrEngine.readScreenshots);
+			ocrThread.Start();
 		}
 		private void Form1_Load(object sender, EventArgs e)
 		{
