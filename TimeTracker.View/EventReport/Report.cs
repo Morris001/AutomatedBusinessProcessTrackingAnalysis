@@ -44,7 +44,7 @@ namespace TimeTracker.View
 				).FirstOrDefault();
             IPHostName = Dns.GetHostName();
 
-			// loop through IP addresses for IPv4
+			// get first IPv4 address found
 			IPAddress[] addresses = Dns.GetHostAddresses(IPHostName);
 			foreach(IPAddress ip4 in addresses.Where(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork))
             {
