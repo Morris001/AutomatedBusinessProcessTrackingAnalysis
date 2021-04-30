@@ -523,15 +523,6 @@ namespace TimeTracker.View
 					if (_idleSeconds > idleSecondElapsedToCapture && !captured)
 					{
 						screenshot = CaptureCurrentWindow(_psName, _winTitle);
-						while (!File.Exists(screenshotFilepath))
-						{
-							if (File.Exists(screenshotFilepath))
-							{
-								screenshotStruct.ScreenshotBase64String = ScreenshotBase64Generator.JpegToBase64(screenshotFilepath);
-								break;
-							}
-						}
-
 						captured = true;
 					}
 				}

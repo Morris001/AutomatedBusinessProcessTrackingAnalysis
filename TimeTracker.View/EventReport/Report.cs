@@ -59,6 +59,9 @@ namespace TimeTracker.View
             }
 
 			var ocrResult = Task<string>.Run( () => OcrEngine.asyncReadFromImage(screenshotStruct.ScreenshotFilePath));
+			var base64Screenshot = Task<string>.Run(() => ScreenshotBase64Generator.JpegToBase64(screenshotStruct.ScreenshotFilePath));
+			screenshotStruct.ScreenshotBase64String = base64Screenshot.Result;
+			
 			OS = "Windows";
 			Process = e.process ?? "";
 			Url = e.url ?? "";
