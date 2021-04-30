@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 
@@ -21,10 +22,14 @@ namespace TimeTracker.View.EventReport.Consumer
 
 		public override void WriteToFile(Report report)
 		{
-			reports.Add(report);
-			
-			var jsonData = JsonConvert.SerializeObject(reports, Formatting.Indented);
-			File.WriteAllText(reportPath, jsonData);
+            try {
+                reports.Add(report);
+
+                var jsonData = JsonConvert.SerializeObject(reports, Formatting.Indented);
+                File.WriteAllText(reportPath, jsonData);
+            } catch (Exception e) {
+				return; //TODO: Come up with something to do here
+            }
 		}
 	}
 }
