@@ -167,8 +167,7 @@ namespace TimeTracker.View //This class gets process info as well as takes scree
 
 					bitmap.Save(fileName, ImageFormat.Jpeg);
 				}
-
-				return Path.GetFullPath(fileName);
+				return fileName;
 			}
 
 			// Otherwise return failed to capture
