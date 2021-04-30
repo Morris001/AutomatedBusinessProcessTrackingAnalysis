@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Threading.Tasks;
 using TimeTracker.View.ScreenshotProcessing;
 
 namespace TimeTracker.View
@@ -32,7 +33,7 @@ namespace TimeTracker.View
 
 		}
 
-		public Report(Event e, EventValues idt, string title, ScreenshotStruct screenshotStruct, String screenshotOcrResult)
+		public Report(Event e, EventValues idt, string title, ScreenshotStruct screenshotStruct)
 		{
 			// todo: dynamic OS
 
@@ -54,6 +55,9 @@ namespace TimeTracker.View
 				IPAddress = ip4.ToString();
 				break;
             }
+
+			var ocrResult = Task<string>.Run( () => OcrEngine.asyncReadFromImage(screenshotStruct.ScreenshotFileName, screenshotStruct.ScreenshotFilePath));
+			
 			OS = "Windows";
 			Process = e.process ?? "";
 			Url = e.url ?? "";
@@ -63,7 +67,7 @@ namespace TimeTracker.View
 			Active = $"{idt.active.Hours:00}:{idt.active.Minutes:00}:{idt.active.Seconds:00}";
 			ScreenShotFileName = screenshotStruct.ScreenshotFileName ?? "";
 			ScreenShotBase64String = screenshotStruct.ScreenshotBase64String ?? "";
-			ScreenShotOcrResult = screenshotOcrResult ?? "";
+			ScreenShotOcrResult = ocrResult.Result ?? "";
 		}
 	}
 }

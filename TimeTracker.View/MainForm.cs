@@ -57,6 +57,7 @@ namespace TimeTracker.View
 		Stopwatch _stopwatch = new Stopwatch();
 		TimeSpan _ts = new TimeSpan();
 		private string screenshot;
+		private string screenshotFilepath;
 		private ScreenshotStruct screenshotStruct;
 		
 
@@ -213,7 +214,9 @@ namespace TimeTracker.View
 			var fileName = $"{_psName}_{today:yyyyMMddhhmmss}";
 
 			Directory.CreateDirectory(path);
-			this.screenshotStruct = new ScreenshotStruct(fileName,);
+			String screenshotFilepath = Path.GetFullPath(Path.Combine(path, $"{fileName}.jpeg"));
+			this.screenshotFilepath = screenshotFilepath;
+			this.screenshotStruct = new ScreenshotStruct(fileName, screenshotFilepath, null); //screenshot doesn't exist yet, no sense in converting it to base64 now
 
 			return ProcessInfo.CaptureActiveWindowScreenShot(path, fileName, applicationName, windowName);
 		}
@@ -517,7 +520,7 @@ namespace TimeTracker.View
 					if (_idleSeconds > idleSecondElapsedToCapture && !captured)
 					{
 						screenshot = CaptureCurrentWindow(_psName, _winTitle);
-						
+						this.screenshotStruct.ScreenshotBase64String = ScreenshotBase64Generator.JpegToBase64(screenshotFilepath);
 
 						captured = true;
 					}
