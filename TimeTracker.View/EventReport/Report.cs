@@ -21,7 +21,9 @@ namespace TimeTracker.View
 		public string Duration { get; set; }
 		public string Idle { get; set; }
 		public string Active { get; set; }
-		public string ScreenShot { get; set; }
+		public string ScreenShotFileName { get; set; }
+		public string ScreenShotBase64String { get; set; }
+		public string ScreenShotOcrResult { get; set; }
 
 
 		public Report()
@@ -29,7 +31,7 @@ namespace TimeTracker.View
 
 		}
 
-		public Report(Event e, EventValues idt, string title, string screenShot)
+		public Report(Event e, EventValues idt, string title, String screenshotFilename, String screenshotBase64String, String screenshotOcrResult)
 		{
 			// todo: dynamic OS
 
@@ -58,7 +60,9 @@ namespace TimeTracker.View
 			Duration = $"{idt.ts.Hours:00}:{idt.ts.Minutes:00}:{idt.ts.Seconds:00}";
 			Idle = $"{idt.idle.Hours:00}:{idt.idle.Minutes:00}:{idt.idle.Seconds:00}";
 			Active = $"{idt.active.Hours:00}:{idt.active.Minutes:00}:{idt.active.Seconds:00}";
-			ScreenShot = screenShot ?? "";
+			ScreenShotFileName = screenshotFilename ?? "";
+			ScreenShotBase64String = screenshotBase64String ?? "";
+			ScreenShotOcrResult = screenshotOcrResult ?? "";
 		}
 	}
 }

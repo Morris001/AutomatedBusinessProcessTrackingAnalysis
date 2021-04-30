@@ -370,7 +370,7 @@ namespace TimeTracker.View
 		}
 
 		
-		private void StoreGlobal(int newItem, Event e)
+		private void StoreGlobal(int newItem, Event e, String screenshotFilename, String screenshotBase64String, String screenshotOcrResult)
 		{
 			var report = new Report(e, Global.dictionaryEvents[e], _winTitle, screenshot);
 			var today = DateTime.Now.Date.ToString("yyyy_MM_dd");
