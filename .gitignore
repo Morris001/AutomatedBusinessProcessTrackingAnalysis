@@ -355,3 +355,4 @@ MigrationBackup/
 /packages/*
 
 *.dll
+*.idea/

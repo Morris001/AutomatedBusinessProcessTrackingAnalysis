@@ -17,6 +17,7 @@ using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using System.Windows.Forms.VisualStyles;
+using TimeTracker.View.ScreenshotProcessing;
 
 
 namespace TimeTracker.View
@@ -56,6 +57,7 @@ namespace TimeTracker.View
 		Stopwatch _stopwatch = new Stopwatch();
 		TimeSpan _ts = new TimeSpan();
 		private string screenshot;
+		private ScreenshotStruct screenshotStruct;
 		
 
 		int _i, _j, _k = 0;
@@ -211,6 +213,7 @@ namespace TimeTracker.View
 			var fileName = $"{_psName}_{today:yyyyMMddhhmmss}";
 
 			Directory.CreateDirectory(path);
+			this.screenshotStruct = new ScreenshotStruct(fileName,);
 
 			return ProcessInfo.CaptureActiveWindowScreenShot(path, fileName, applicationName, windowName);
 		}
@@ -370,9 +373,9 @@ namespace TimeTracker.View
 		}
 
 		
-		private void StoreGlobal(int newItem, Event e, String screenshotFilename, String screenshotBase64String, String screenshotOcrResult)
+		private void StoreGlobal(int newItem, Event e)
 		{
-			var report = new Report(e, Global.dictionaryEvents[e], _winTitle, screenshot);
+			var report = new Report(e, Global.dictionaryEvents[e], _winTitle, screenshotStruct);
 			var today = DateTime.Now.Date.ToString("yyyy_MM_dd");
 			var path = this.userpath + "/Logs/";
 			Directory.CreateDirectory(path);
@@ -514,6 +517,7 @@ namespace TimeTracker.View
 					if (_idleSeconds > idleSecondElapsedToCapture && !captured)
 					{
 						screenshot = CaptureCurrentWindow(_psName, _winTitle);
+						
 
 						captured = true;
 					}

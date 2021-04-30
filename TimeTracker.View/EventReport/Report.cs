@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using TimeTracker.View.ScreenshotProcessing;
 
 namespace TimeTracker.View
 {
@@ -31,7 +32,7 @@ namespace TimeTracker.View
 
 		}
 
-		public Report(Event e, EventValues idt, string title, String screenshotFilename, String screenshotBase64String, String screenshotOcrResult)
+		public Report(Event e, EventValues idt, string title, ScreenshotStruct screenshotStruct, String screenshotOcrResult)
 		{
 			// todo: dynamic OS
 
@@ -60,8 +61,8 @@ namespace TimeTracker.View
 			Duration = $"{idt.ts.Hours:00}:{idt.ts.Minutes:00}:{idt.ts.Seconds:00}";
 			Idle = $"{idt.idle.Hours:00}:{idt.idle.Minutes:00}:{idt.idle.Seconds:00}";
 			Active = $"{idt.active.Hours:00}:{idt.active.Minutes:00}:{idt.active.Seconds:00}";
-			ScreenShotFileName = screenshotFilename ?? "";
-			ScreenShotBase64String = screenshotBase64String ?? "";
+			ScreenShotFileName = screenshotStruct.ScreenshotFileName ?? "";
+			ScreenShotBase64String = screenshotStruct.ScreenshotBase64String ?? "";
 			ScreenShotOcrResult = screenshotOcrResult ?? "";
 		}
 	}
