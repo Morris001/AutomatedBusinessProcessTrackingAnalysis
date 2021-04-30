@@ -41,15 +41,12 @@ namespace TimeTracker.View
             this.folderWithScreenshotsPath = folderWithScreenshotsPath;
             this.outputDirectoryPath = outputDirectoryPath;
         }
-        
         public static String asyncReadFromImage(string imagePath) {
             //var TESSDATA_PREFIX = ;
+            
             try {
                 //NOTE: This filepath needs to be altered for it to work on your machine, change it to where your .tessdata folder (which contains the eng.traineddata file in this project's directory) is
                 //We need to have this installed in ProgramFiles via the .msi so there can be a fixed location.
-                FileSystemWatcher fileCreationWatcher = new FileSystemWatcher();
-                fileCreationWatcher.Path = Path.GetDirectoryName(imagePath);
-                fileCreationWatcher.Filter = Path.GetFileName(imagePath);
                 TesseractEngine tesseractEngineInstance = new TesseractEngine(@"C:\DEV\AutomatedBusinessProcessTrackingAnalysis\TimeTracker.View\tessdata", "eng", EngineMode.Default);
                 Pix img = Pix.LoadFromFile(imagePath); //Change to var, maybe?
                 Page page = tesseractEngineInstance.Process(img);

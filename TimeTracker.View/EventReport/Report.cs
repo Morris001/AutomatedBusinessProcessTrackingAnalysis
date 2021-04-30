@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Threading;
 using System.Threading.Tasks;
 using TimeTracker.View.ScreenshotProcessing;
 
@@ -56,8 +58,7 @@ namespace TimeTracker.View
 				break;
             }
 
-			var ocrResult = Task<string>.Run( () => OcrEngine.asyncReadFromImage(screenshotStruct.ScreenshotFileName, screenshotStruct.ScreenshotFilePath));
-			
+			var ocrResult = Task<string>.Run( () => OcrEngine.asyncReadFromImage(screenshotStruct.ScreenshotFilePath));
 			OS = "Windows";
 			Process = e.process ?? "";
 			Url = e.url ?? "";

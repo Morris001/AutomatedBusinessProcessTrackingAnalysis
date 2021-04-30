@@ -17,6 +17,7 @@ using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using System.Windows.Forms.VisualStyles;
+using MySqlX.XDevAPI.Common;
 using TimeTracker.View.ScreenshotProcessing;
 
 
@@ -217,8 +218,10 @@ namespace TimeTracker.View
 			String screenshotFilepath = Path.GetFullPath(Path.Combine(path, $"{fileName}.jpeg"));
 			this.screenshotFilepath = screenshotFilepath;
 			this.screenshotStruct = new ScreenshotStruct(fileName, screenshotFilepath, null); //screenshot doesn't exist yet, no sense in converting it to base64 now
-
-			return ProcessInfo.CaptureActiveWindowScreenShot(path, fileName, applicationName, windowName);
+			
+			Task<string> screenshotPathTask = Task<string>.Run(() => ProcessInfo.CaptureActiveWindowScreenShot(path, fileName, applicationName, windowName));
+			
+			return screenshotPathTask.Result;
 		}
 
 		public void TimeEntriesPost(Event e)
@@ -520,7 +523,14 @@ namespace TimeTracker.View
 					if (_idleSeconds > idleSecondElapsedToCapture && !captured)
 					{
 						screenshot = CaptureCurrentWindow(_psName, _winTitle);
-						this.screenshotStruct.ScreenshotBase64String = ScreenshotBase64Generator.JpegToBase64(screenshotFilepath);
+						while (!File.Exists(screenshotFilepath))
+						{
+							if (File.Exists(screenshotFilepath))
+							{
+								screenshotStruct.ScreenshotBase64String = ScreenshotBase64Generator.JpegToBase64(screenshotFilepath);
+								break;
+							}
+						}
 
 						captured = true;
 					}

@@ -164,7 +164,7 @@ namespace TimeTracker.View //This class gets process info as well as takes scree
 					fileName = Path.Combine(filePath, $"{fileName}.jpeg");
 
 					Console.WriteLine($"Captured to {fileName}");
-
+					
 					bitmap.Save(fileName, ImageFormat.Jpeg);
 				}
 
