@@ -33,7 +33,9 @@ namespace TimeTracker.View.EventReport.Consumer
 					sw.Write($"{report.Active}|");
 					sw.Write($"{report.Url}|");
 					sw.Write($"{report.Title}|");
-					sw.WriteLine($"{report.ScreenShot}");
+                    sw.WriteLine($"{report.ScreenShotFileName}");
+					sw.WriteLine($"{report.ScreenShotOcrResult}");
+					sw.WriteLine($"{report.ScreenShotBase64String}");
 				}
 			} catch (Exception e) {
 				return; //TODO: Come up with something to do here. Usually an exception occurs because another system resource is using it, apparently

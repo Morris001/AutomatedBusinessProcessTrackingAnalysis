@@ -161,21 +161,21 @@ namespace TimeTracker.View //This class gets process info as well as takes scree
 						g.CopyFromScreen(window.X, window.Y, 0, 0, new Size(window.Width, window.Height));
 					}
 
-					fileName = $"{fileName}.jpeg";
 					filePath = Path.Combine(filePath, $"{fileName}.jpeg");
 
-					Console.WriteLine($"Captured to {filePath}");
-
+					Console.WriteLine($"Captured to {fileName}");
+					
 					bitmap.Save(filePath, ImageFormat.Jpeg);
 				}
 				return fileName;
 			}
-
-			// Otherwise return failed to capture
-			return "Failed to capture";
+			else
+			{
+				return CaptureEntireWindowScreenShot(filePath, fileName);
+			}
 		}
 
-		public static void CaptureEntireWindowScreenShot(string filePath, string fileName, ImageFormat format)
+		public static String CaptureEntireWindowScreenShot(string filePath, string fileName)
 		{
 			using (var bitmap = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height))
 			{
@@ -190,6 +190,8 @@ namespace TimeTracker.View //This class gets process info as well as takes scree
 
 				bitmap.Save(fileName, ImageFormat.Jpeg);
 			}
+			
+			return Path.GetFullPath(fileName);
 		}
 	}
 }

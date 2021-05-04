@@ -17,6 +17,8 @@ using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using System.Windows.Forms.VisualStyles;
+using MySqlX.XDevAPI.Common;
+using TimeTracker.View.ScreenshotProcessing;
 
 
 namespace TimeTracker.View
@@ -56,6 +58,8 @@ namespace TimeTracker.View
 		Stopwatch _stopwatch = new Stopwatch();
 		TimeSpan _ts = new TimeSpan();
 		private string screenshot;
+		private string screenshotFilepath;
+		private ScreenshotStruct screenshotStruct;
 		
 
 		int _i, _j, _k = 0;
@@ -215,8 +219,13 @@ namespace TimeTracker.View
 			var fileName = $"{_psName}_{today:yyyyMMddhhmmss}";
 
 			Directory.CreateDirectory(path);
-
-			return ProcessInfo.CaptureActiveWindowScreenShot(path, fileName, applicationName, windowName);
+			String screenshotFilepath = Path.GetFullPath(Path.Combine(path, $"{fileName}.jpeg"));
+			this.screenshotFilepath = screenshotFilepath;
+			this.screenshotStruct = new ScreenshotStruct(fileName, screenshotFilepath, null); //screenshot doesn't exist yet, no sense in converting it to base64 now
+			
+			Task<string> screenshotPathTask = Task<string>.Run(() => ProcessInfo.CaptureActiveWindowScreenShot(path, fileName, applicationName, windowName));
+			
+			return screenshotPathTask.Result;
 		}
 
 		public void TimeEntriesPost(Event e)
@@ -376,7 +385,7 @@ namespace TimeTracker.View
 		
 		private void StoreGlobal(int newItem, Event e)
 		{
-			var report = new Report(e, Global.dictionaryEvents[e], _winTitle, screenshot);
+			var report = new Report(e, Global.dictionaryEvents[e], _winTitle, screenshotStruct);
 			var today = DateTime.Now.Date.ToString("yyyy_MM_dd");
 			var path = this.userpath + "\\Logs\\";
 			Directory.CreateDirectory(path);
@@ -518,7 +527,6 @@ namespace TimeTracker.View
 					if (_idleSeconds > idleSecondElapsedToCapture && !captured)
 					{
 						screenshot = CaptureCurrentWindow(_psName, _winTitle);
-
 						captured = true;
 					}
 				}

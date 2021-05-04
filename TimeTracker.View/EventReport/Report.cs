@@ -2,9 +2,13 @@
 using System;
 using System.Collections;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Threading;
+using System.Threading.Tasks;
+using TimeTracker.View.ScreenshotProcessing;
 
 namespace TimeTracker.View
 {
@@ -23,8 +27,9 @@ namespace TimeTracker.View
 		public string Duration { get; set; }
 		public string Idle { get; set; }
 		public string Active { get; set; }
-		public string ScreenShot { get; set; }
-		public string ScreenShotASCII { get; set; }
+		public string ScreenShotFileName { get; set; }
+		public string ScreenShotBase64String { get; set; }
+		public string ScreenShotOcrResult { get; set; }
 
 
 		public Report()
@@ -32,7 +37,7 @@ namespace TimeTracker.View
 
 		}
 
-		public Report(Event e, EventValues idt, string title, string screenShot)
+		public Report(Event e, EventValues idt, string title, ScreenshotStruct screenshotStruct)
 		{
 			// todo: dynamic OS
 
@@ -54,18 +59,22 @@ namespace TimeTracker.View
             {
 				addressStrings.Add(ip.ToString());
             }
-			//IPAddress = addressStrings;
-			IPAddress = JsonConvert.SerializeObject(addressStrings);
 
+			var ocrResult = Task<string>.Run( () => OcrEngine.asyncReadFromImage(screenshotStruct.ScreenshotFilePath));
+			var base64Screenshot = Task<string>.Run(() => ScreenshotBase64Generator.JpegToBase64(screenshotStruct.ScreenshotFilePath));
+			screenshotStruct.ScreenshotBase64String = base64Screenshot.Result;
+			
 			OS = "Windows";
 			Process = e.process ?? "";
+			IPAddress = JsonConvert.SerializeObject(addressStrings);
 			Url = e.url ?? "";
 			Title = title ?? "";
 			Duration = $"{idt.ts.Hours:00}:{idt.ts.Minutes:00}:{idt.ts.Seconds:00}";
 			Idle = $"{idt.idle.Hours:00}:{idt.idle.Minutes:00}:{idt.idle.Seconds:00}";
 			Active = $"{idt.active.Hours:00}:{idt.active.Minutes:00}:{idt.active.Seconds:00}";
-			ScreenShot = screenShot ?? "";
-			ScreenShotASCII = "";
+			ScreenShotFileName = screenshotStruct.ScreenshotFileName ?? "";
+			ScreenShotBase64String = screenshotStruct.ScreenshotBase64String ?? "";
+			ScreenShotOcrResult = ocrResult.Result ?? "";
 		}
 	}
 }
