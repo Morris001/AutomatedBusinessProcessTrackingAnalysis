@@ -161,14 +161,14 @@ namespace TimeTracker.View //This class gets process info as well as takes scree
 						g.CopyFromScreen(window.X, window.Y, 0, 0, new Size(window.Width, window.Height));
 					}
 
-					fileName = Path.Combine(filePath, $"{fileName}.jpeg");
+					fileName = $"{fileName}.jpeg";
+					filePath = Path.Combine(filePath, $"{fileName}.jpeg");
 
-					Console.WriteLine($"Captured to {fileName}");
+					Console.WriteLine($"Captured to {filePath}");
 
-					bitmap.Save(fileName, ImageFormat.Jpeg);
+					bitmap.Save(filePath, ImageFormat.Jpeg);
 				}
-
-				return Path.GetFullPath(fileName);
+				return fileName;
 			}
 
 			// Otherwise return failed to capture

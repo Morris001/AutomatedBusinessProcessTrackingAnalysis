@@ -90,6 +90,10 @@ namespace TimeTracker.View
                 idleMonitor = new Thread(StartIdleMonitoring);
                 idleMonitor.IsBackground = true;
                 idleMonitor.Start();
+
+				//background threads
+				backgroundWorker1.WorkerReportsProgress = true; //upload
+				backgroundWorker2.WorkerReportsProgress = true; //download
             }
 			catch (Exception e)
 			{
@@ -130,13 +134,13 @@ namespace TimeTracker.View
 				if (_keysListening.Contains(vkCode))
 				{
 					label30.Text = vkCode.ToString();
-					CaptureCurrentWindow(_psName, _winTitle);
+					screenshot = CaptureCurrentWindow(_psName, _winTitle);
 				}
 			}
 			// Capture a screenshot if the last input was a mouse AND _inputWaitTime seconds have passed since it has been used
 			else if (!_lastInputMethod && (_lastInputTime - DateTime.UtcNow).TotalSeconds > _inputWaitTime) 
 			{
-				CaptureCurrentWindow(_psName, _winTitle);
+				screenshot = CaptureCurrentWindow(_psName, _winTitle);
 			}
 			_lastInputMethod = true;
 			_lastInputTime = DateTime.UtcNow;
@@ -149,12 +153,12 @@ namespace TimeTracker.View
 			// Capture a screenshot when event defined in _mouseEventsListening
 			if (nCode >= 0 && (_mouseEventsListening.Contains(wParam)))
 			{
-				CaptureCurrentWindow(_psName, _winTitle);
+				screenshot = CaptureCurrentWindow(_psName, _winTitle);
 			}
 			// Capture a screenshot if the last input was a keyboard AND _inputWaitTime seconds have passed since it has been used
 			else if (_lastInputMethod && (_lastInputTime - DateTime.UtcNow).TotalSeconds > _inputWaitTime)
 			{
-				CaptureCurrentWindow(_psName, _winTitle);
+				screenshot = CaptureCurrentWindow(_psName, _winTitle);
 			}
 			_lastInputMethod = false;
 			_lastInputTime = DateTime.UtcNow;
@@ -206,7 +210,7 @@ namespace TimeTracker.View
 
 		private string CaptureCurrentWindow(string applicationName, string windowName)
 		{
-			var path = this.userpath + "/Captures/";
+			var path = this.userpath + "\\Captures\\";
 			var today = DateTime.Now;
 			var fileName = $"{_psName}_{today:yyyyMMddhhmmss}";
 
@@ -374,7 +378,7 @@ namespace TimeTracker.View
 		{
 			var report = new Report(e, Global.dictionaryEvents[e], _winTitle, screenshot);
 			var today = DateTime.Now.Date.ToString("yyyy_MM_dd");
-			var path = this.userpath + "/Logs/";
+			var path = this.userpath + "\\Logs\\";
 			Directory.CreateDirectory(path);
 			string reportName;
 
@@ -618,61 +622,28 @@ namespace TimeTracker.View
 			}
 		}
 
-		private void button3_Click(object sender, EventArgs e)//This is the upload button- use string[] GetFiles(string path) to get files in folder
+		private void button3_Click(object sender, EventArgs e)//upload
 		{
-			//var client = new MongoClient("mongodb+srv://admin:admin@cluster0.femb8.mongodb.net/group1db?retryWrites=true&w=majority");
-			var client = new MongoClient("mongodb+srv://admin:admin@cluster0.oqexz.mongodb.net/group1db?retryWrites=true&w=majority");//personal mongoDB account made to test after issues with provided one
-			var database = client.GetDatabase("group1db");
-			var fs = new GridFSBucket(database);
-			//FilePathString
-			var logPath = this.userpath + "/Logs/";
-			foreach (String filePath in Directory.GetFiles(logPath))//iterate over every file in log folder, returns full path of files
-			{
-				using (var stream = File.OpenRead(filePath))
-				{
-					int index = filePath.IndexOf("/Logs/");
-;					string filename = filePath.Substring(index+6);
-					fs.UploadFromStream(filename, stream);
-				}
-			}
-			var capPath = this.userpath + "/Captures/";
-			foreach (String filePath in Directory.GetFiles(capPath))//iterate over every file in captures folder, returns full file path
-			{
-				using (var stream = File.OpenRead(filePath))
-				{
-					int index = filePath.IndexOf("/Captures/");
-					string filename = filePath.Substring(index + 10);
-					fs.UploadFromStream(filename, stream);
-				}
-			}
+			if(backgroundWorker1.IsBusy != true)
+            {
+				//Start asynchronous operation
+				backgroundWorker1.RunWorkerAsync();
+            }
 			debugLabel.Text = "Upload Complete";
 		}
 
 		private void button5_Click(object sender, EventArgs e)//download
 		{
-			//var client = new MongoClient("mongodb+srv://admin:admin@cluster0.femb8.mongodb.net/group1db?retryWrites=true&w=majority");
-			var client = new MongoClient("mongodb+srv://admin:admin@cluster0.oqexz.mongodb.net/group1db?retryWrites=true&w=majority");//personal mongoDB account made to test after issues with provided one
-			var database = client.GetDatabase("group1db");
-			var fs = new GridFSBucket(database);
-			//var collecFiles = database.GetCollection<BsonDocument>("fs.files");
-			var filter = Builders<GridFSFileInfo>.Filter.And(Builders<GridFSFileInfo>.Filter.Regex(x => x.Filename, "csv"));
-			var list =  fs.Find(filter).ToList();
-			var endpath = this.userpath + "/Analysis/";
-			Directory.CreateDirectory(endpath);
-			foreach (GridFSFileInfo doc in list)
-			{
-				string path = endpath + doc.Filename;
-				using (var stream = File.OpenWrite(path))
-				{
-					fs.DownloadToStream(doc.Id, stream);
-				}
-			}
-			//Analysis.LoadJson();
+			if(backgroundWorker2.IsBusy != true)
+            {
+				//Start asynchronous operation
+				backgroundWorker2.RunWorkerAsync();
+            }
 			debugLabel.Text = "Download Complete";
 		}
 		private void button1_Click(object sender, EventArgs e) { //OCR button
-			String folderWithScreenshotsPath = this.userpath + "/Captures/";
-			String outputDirectoryPath = folderWithScreenshotsPath + "OCR/";
+			String folderWithScreenshotsPath = this.userpath + "\\Captures\\";
+			String outputDirectoryPath = folderWithScreenshotsPath + "OCR\\";
             OcrEngine ocrEngine = new OcrEngine(folderWithScreenshotsPath, outputDirectoryPath);
 			Directory.CreateDirectory(outputDirectoryPath);
 
@@ -697,7 +668,56 @@ namespace TimeTracker.View
 		[return: MarshalAs(UnmanagedType.Bool)]
 		private static extern bool UnhookWindowsHookEx(IntPtr hhk);
 
+        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        {
+            // upload function
+            var client = new MongoClient("mongodb+srv://admin:admin@cluster0.oqexz.mongodb.net/group1db?retryWrites=true&w=majority");
+			var database = client.GetDatabase("group1db");
+			var fs = new GridFSBucket(database);
+			//FilePathString
+			var logPath = this.userpath + "\\Logs\\";
+			foreach (String filePath in Directory.GetFiles(logPath))//iterate over every file in log folder, returns full path of files
+			{
+				using (var stream = File.OpenRead(filePath))
+				{
+					int index = filePath.IndexOf("\\Logs\\");
+					; string filename = filePath.Substring(index + 6);
+					fs.UploadFromStream(filename, stream);
+				}
+			}
+			var capPath = this.userpath + "\\Captures\\";
+			foreach (String filePath in Directory.GetFiles(capPath))//iterate over every file in captures folder, returns full file path
+			{
+				using (var stream = File.OpenRead(filePath))
+				{
+					int index = filePath.IndexOf("\\Captures\\");
+					string filename = filePath.Substring(index + 10);
+					fs.UploadFromStream(filename, stream);
+				}
+			}
+		}
 
+        private void backgroundWorker2_DoWork_1(object sender, DoWorkEventArgs e)
+        {
+			// download function
+			//var client = new MongoClient("mongodb+srv://admin:admin@cluster0.femb8.mongodb.net/group1db?retryWrites=true&w=majority")
+			var client = new MongoClient("mongodb+srv://admin:admin@cluster0.oqexz.mongodb.net/group1db?retryWrites=true&w=majority");
+			var database = client.GetDatabase("group1db");
+			var fs = new GridFSBucket(database);
+			//var collecFiles = database.GetCollection<BsonDocument>("fs.files");
+			var filter = Builders<GridFSFileInfo>.Filter.And(Builders<GridFSFileInfo>.Filter.Regex(x => x.Filename, "csv"));
+			var list = fs.Find(filter).ToList();
+			var endpath = this.userpath + "\\Analysis\\";
+			Directory.CreateDirectory(endpath);
+			foreach (GridFSFileInfo doc in list)
+			{
+				string path = endpath + doc.Filename;
+				using (var stream = File.OpenWrite(path))
+				{
+					fs.DownloadToStream(doc.Id, stream);
+				}
+			}
+		}
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
 		private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -12,7 +14,7 @@ namespace TimeTracker.View
 		public string UserName { get; set; }
 		public string MacAddress { get; set; }
 		public string IPHostName { get; set; }
-		public string IPAddress { get; set; }
+        public string IPAddress { get; set; }
 		public string Id { get; set; }
 		public string OS { get; set; }
 		public string Process { get; set; }
@@ -22,6 +24,7 @@ namespace TimeTracker.View
 		public string Idle { get; set; }
 		public string Active { get; set; }
 		public string ScreenShot { get; set; }
+		public string ScreenShotASCII { get; set; }
 
 
 		public Report()
@@ -44,13 +47,16 @@ namespace TimeTracker.View
 				).FirstOrDefault();
             IPHostName = Dns.GetHostName();
 
-			// get first IPv4 address found
+			// get all ip addresses
 			IPAddress[] addresses = Dns.GetHostAddresses(IPHostName);
-			foreach(IPAddress ip4 in addresses.Where(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork))
+			ArrayList addressStrings = new ArrayList();
+			foreach(IPAddress ip in addresses)
             {
-				IPAddress = ip4.ToString();
-				break;
+				addressStrings.Add(ip.ToString());
             }
+			//IPAddress = addressStrings;
+			IPAddress = JsonConvert.SerializeObject(addressStrings);
+
 			OS = "Windows";
 			Process = e.process ?? "";
 			Url = e.url ?? "";
@@ -59,6 +65,7 @@ namespace TimeTracker.View
 			Idle = $"{idt.idle.Hours:00}:{idt.idle.Minutes:00}:{idt.idle.Seconds:00}";
 			Active = $"{idt.active.Hours:00}:{idt.active.Minutes:00}:{idt.active.Seconds:00}";
 			ScreenShot = screenShot ?? "";
+			ScreenShotASCII = "";
 		}
 	}
 }
