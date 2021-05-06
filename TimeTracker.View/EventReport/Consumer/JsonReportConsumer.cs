@@ -28,8 +28,9 @@ namespace TimeTracker.View.EventReport.Consumer
                 var jsonData = JsonConvert.SerializeObject(reports, Formatting.Indented);
                 File.WriteAllText(reportPath, jsonData);
             } catch (Exception e) {
-				return; //TODO: Come up with something to do here
-            }
+				System.Diagnostics.Debug.WriteLine(("Exception: " + e.ToString()));
+				return;
+			}
 		}
 	}
 }

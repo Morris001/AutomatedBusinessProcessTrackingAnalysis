@@ -38,7 +38,8 @@ namespace TimeTracker.View.EventReport.Consumer
 					sw.WriteLine($"{report.ScreenShotBase64String}");
 				}
 			} catch (Exception e) {
-				return; //TODO: Come up with something to do here. Usually an exception occurs because another system resource is using it, apparently
+				System.Diagnostics.Debug.WriteLine(("Exception: " + e.ToString()));
+				return;
 			}
 		}
 	}
