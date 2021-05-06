@@ -91,7 +91,8 @@ namespace TimeTracker.View
                     File.WriteAllText(filepath, text); //Shouldn't be writing to the same file more than once
                 }
             } catch (Exception e) {
-                return; //Come up with something to do if writing to a file fails later
+                System.Diagnostics.Debug.WriteLine(("Exception: " + e.ToString()));
+                return;
             }
         }
     }
