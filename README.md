@@ -15,4 +15,5 @@ We utilized Visual Studio and C# to work on this project, and it works locally i
 -MongoDB Data Storage
 	Uses Tom Hill's MongoDB Account and a database provided to store files.
 
+In order for OCR to work, the directory path to /tessdata in OcrEngine.cs's readFromImage function must be changed for each user running from Visual Studios.
 To create MSI make sure that the Microsoft Visual Studio Installer Projects extension is installed.
